@@ -1,0 +1,111 @@
+swagger: '2.0'
+info:
+  title: 'Event Graph'
+  description: >
+    This is a description
+  version: '1.0.0'
+  host: 'localhost:3000'
+schemes:
+  - 'http'
+paths:
+  /graph:
+    get:
+      summary: 'Returns the current graph'
+      produces:
+        - 'application/json'
+      responses:
+        200:
+          description: 'successful operation'
+          schema:
+            $ref: '#/definitions/Graph'
+        500:
+          $ref: '#/responses/500'
+    put:
+      summary: 'Merges into the current graph'
+      parameters:
+        - in: 'body'
+          name: 'body'
+          required: true
+          schema:
+            $ref: '#/definitions/Graph'
+      responses:
+        200:
+          description: 'successful operation'
+
+  /graph/decycle:
+    get:
+      summary: 'Returns the current graph in its original ResolvedGraph form with its internal references replaced with JSONPath refs'
+      description: 'Check out this file to parse its contents back into a ResolvedGraph: https://github.com/douglascrockford/JSON-js/blob/master/cycle.js'
+      produces:
+        - 'application/json'
+      responses:
+        200:
+          description: 'successful operation'
+          schema:
+            $ref: '#definitions/decycledGraph'
+        500:
+          $ref: '#/responses/500'
+
+responses:
+  400:
+    description: Bad Request
+    schema:
+      $ref: '#/definitions/Error'
+  401:
+    description: Unauthorized
+    schema:
+      $ref: '#/definitions/Error'
+  500:
+    description: Internal Server Error
+    schema:
+      $ref: '#/definitions/Error'
+
+definitions:
+  Graph:
+    type: 'object'
+    properties:
+      nodes:
+        type: 'array'
+        items:
+          $ref: '#/definitions/Node'
+      links:
+        type: 'array'
+        items:
+          $ref: '#/definitions/Link'
+
+  Node:
+    type: 'object'
+    properties:
+      id:
+        type: 'string'
+      data:
+        type: 'object'
+
+  Link:
+    type: 'object'
+    properties:
+      id:
+        type: 'string'
+      from:
+        type: 'string'
+      to:
+        type: 'string'
+      data:
+        type: 'object'
+
+  decycledGraph:
+    type: 'object'
+    properties:
+      _nodes:
+        type: object
+      _links:
+        type: object
+
+  Error:
+    type: 'object'
+    properties:
+      data:
+        type: 'object'
+        properties:
+          error:
+            type: 'string'
